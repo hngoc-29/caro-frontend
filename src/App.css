@@ -1,0 +1,424 @@
+* {
+  padding: 0;
+  margin: 0;
+}
+
+.page-1 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 80%;
+  /* Trừ đi 20px để tạo khoảng cách đều hai bên */
+  /* Sử dụng 90% chiều rộng màn hình để tránh mất đoạn bên trái */
+  max-width: 400px;
+  /* Giới hạn tối đa */
+  margin: 0 auto;
+  /* Căn giữa */
+}
+
+.btn,
+.input-field {
+  min-width: calc(100% - 20px);
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 8px;
+  border: none;
+  text-align: center;
+  transition: all 0.3s ease-in-out;
+}
+
+.input-field {
+  border: 2px solid #ccc;
+  outline: none;
+}
+
+.input-field:focus {
+  border-color: #ff758c;
+}
+
+.btn {
+  background: linear-gradient(135deg, #ff7eb3, #ff758c);
+  color: white;
+  cursor: pointer;
+}
+
+.btn:hover {
+  background: linear-gradient(135deg, #ff5a95, #ff3e70);
+  transform: scale(1.05);
+}
+
+.btn:active {
+  transform: scale(0.95);
+  opacity: 0.8;
+}
+
+/* Đảm bảo luôn chiếm đủ chiều rộng trên màn hình nhỏ */
+@media (max-width: 500px) {
+  .container {
+    width: 100%;
+    padding: 0 10px;
+    /* Giữ khoảng cách hai bên */
+  }
+}
+
+/*Wait cpn*/
+.waitModal {
+  display: flex;
+  z-index: 10;
+  flex-direction: column;
+  align-items: center;
+}
+
+.countSec {
+  background-color: #ccc;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+}
+
+.waitBtnBack {
+  margin-top: 8px;
+  padding: 3px 5px;
+}
+
+/* modal */
+/* Overlay nền tối */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+/* Nội dung modal */
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 350px;
+  max-width: 90%;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Nút đóng (X) */
+.modal-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #555;
+}
+
+/* Input */
+.modal-input {
+  width: 95%;
+  padding: 8px;
+  margin: 10px 0;
+  margin-right: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+/* Khu vực chứa nút */
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+}
+
+/* Nút chung */
+.modal-btn {
+  padding: 8px 15px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+/* Nút hủy */
+.modal-btn.cancel {
+  background: #ccc;
+}
+
+/* Nút xác nhận */
+.modal-btn.confirm {
+  background: #007bff;
+  color: white;
+}
+
+/* Hiệu ứng mở modal */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* room */
+.room-container {
+  position: relative;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  max-width: 500px;
+  margin: auto;
+}
+
+.back-button {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 8px 12px;
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.3s;
+  z-index: 200;
+}
+
+.back-button:hover {
+  background-color: #d43f3f;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(50px, 80px));
+  /* Điều chỉnh kích thước */
+  gap: 5px;
+  /* Giảm khoảng cách giữa các ô cờ */
+  margin-top: 20px;
+  justify-content: center;
+  background: white;
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.square {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  /* Đảm bảo ô vuông luôn là hình vuông */
+  font-size: 20px;
+  text-align: center;
+  background-color: #f0f0f0;
+  border: 2px solid #ccc;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 5px;
+  transition: background 0.3s, transform 0.2s;
+}
+
+@media (max-width: 600px) {
+  .board {
+    grid-template-columns: repeat(3, minmax(40px, 60px));
+    /* Giảm kích thước cho màn nhỏ */
+    gap: 3px;
+  }
+
+  .square {
+    font-size: 16px;
+  }
+}
+
+.square:hover {
+  background-color: #ddd;
+  transform: scale(1.1);
+}
+
+.playerStatus {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  font-size: 18px;
+  margin-top: 10px;
+}
+
+.playerStatus span {
+  margin-left: 8px;
+  font-size: 20px;
+}
+
+.player-icon {
+  font-size: 20px;
+  font-weight: bold;
+  margin-left: 8px;
+  color: #007bff;
+}
+
+.modalEnd-containner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  /* Slightly darker for better contrast */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.modalEnd-wapper {
+  width: 90%;
+  max-width: 500px;
+  /* Ensure the modal is not too wide on large screens */
+  padding: 20px;
+  background-color: #2e2e2e;
+  /* Soft dark background for modal */
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  z-index: 10;
+}
+
+.modalEnd-title {
+  color: #ffd700;
+  /* Gold color for the title to make it pop */
+  font-size: 48px;
+  font-weight: bold;
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+  /* Adds a subtle shadow for better visibility */
+  margin-bottom: 20px;
+}
+
+.modalEnd-closeTitle {
+  color: #b0b0b0;
+  /* Light gray color for the close text */
+  font-size: 16px;
+  margin-top: 10px;
+  cursor: pointer;
+}
+
+.modalEnd-closeTitle:hover {
+  color: #fff;
+  /* Changes color on hover to indicate it's clickable */
+  text-decoration: underline;
+}
+
+/* chat */
+.chat-wrapper {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  /* Chuyển sang bên phải */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  /* Canh lề phải */
+  z-index: 1000;
+}
+
+/* Nút bật/tắt chat */
+.chat-toggle {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  position: relative;
+}
+
+.chat-status {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 10px;
+  /* Tăng kích thước */
+  height: 10px;
+  /* Tăng kích thước */
+  background-color: #d43f3f;
+  border-radius: 50%;
+  /* Đảm bảo nó là hình tròn */
+}
+
+/* Chat box */
+.chat-container {
+  width: 300px;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  font-family: Arial, sans-serif;
+}
+
+.chat-messages {
+  height: 250px;
+  overflow-y: auto;
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 10px;
+  padding: 5px;
+}
+
+.chat-message {
+  margin-bottom: 5px;
+  font-size: 14px;
+}
+
+.chat-input {
+  display: flex;
+  gap: 5px;
+}
+
+.chat-input input {
+  flex: 1;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+}
+
+.chat-input button {
+  padding: 5px 10px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.chat-input button:hover {
+  background: #0056b3;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .chat-container {
+    width: 90%;
+  }
+}
