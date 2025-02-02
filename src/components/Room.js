@@ -1,20 +1,24 @@
 import { useState, useRef, useEffect } from 'react';
 import ModalEnd from './ModalEnd';
 import ModalChat from './ModalChat';
+import CopyButton from './CopyButton';
 
 const Room = ({ roomNumber, player1, player2, onBack, ower, setOwer, you, socket, setStart }) => {
-    const icon = useRef([`X`, `O`]);
+    const icon = useRef(['X', 'O']);
     const [board, setBoard] = useState(Array(9).fill(null));
     const [iconYou, setIconYou] = useState(null);
     const [iconPlayer1, setIconPlayer1] = useState(null);
     const [iconPlayer2, setIconPlayer2] = useState(null);
-    const [iconCt, setIconCt] = useState(``);
+    const [iconCt, setIconCt] = useState('');
     const [isXNext, setIsXNext] = useState(null);
     const [modalEnd, setModalEnd] = useState(false);
     const [kq, setKq] = useState(null);
     const [winner, setWinner] = useState(null);
-    const [status, setStatus] = useState(``);
+    const [status, setStatus] = useState('');
+    const [timeLeft, setTimeLeft] = useState(10);
     const [boardSize, setBoardSize] = useState(80); // Kích thước ô cờ mặc định
+    const timerRef = useRef(null);
+    const timeLeftRef = useRef(timeLeft);
 
     useEffect(() => {
         const updateSize = () => {
@@ -31,6 +35,38 @@ const Room = ({ roomNumber, player1, player2, onBack, ower, setOwer, you, socket
         return () => window.removeEventListener("resize", updateSize);
     }, []);
 
+    useEffect(() => {
+        timeLeftRef.current = timeLeft; // Cập nhật giá trị ref mỗi khi timeLeft thay đổi
+    }, [timeLeft]);
+
+    useEffect(() => {
+        if (iconYou === iconCt) {
+
+            // Xóa timer cũ nếu có
+            if (timerRef.current) clearInterval(timerRef.current);
+
+            timerRef.current = setInterval(() => {
+                if (timeLeftRef.current <= 1) {
+                    clearInterval(timerRef.current);
+                    const newBoard = board.slice();
+                    const winner = calculateWinner(newBoard);
+                    if (!winner) {
+                        socket.emit('update-board', {
+                            board: newBoard,
+                            isXNext: !isXNext,
+                            roomId: roomNumber,
+                        });
+                    }
+                } else {
+                    socket.emit('update-time', { time: timeLeftRef.current - 1, roomId: roomNumber });
+                }
+            }, 1000);
+        }
+
+        return () => {
+            if (timerRef.current) clearInterval(timerRef.current);
+        };
+    }, [iconYou, iconCt]);
 
     useEffect(() => {
         if (iconPlayer1 !== null && iconPlayer2 !== null) {
@@ -45,53 +81,62 @@ const Room = ({ roomNumber, player1, player2, onBack, ower, setOwer, you, socket
     useEffect(() => {
         if (winner) {
             if (you === player1) {
-                socket.emit(`check-kq`, { winner, roomId: roomNumber });
+                socket.emit('check-kq', { winner, roomId: roomNumber });
             }
         }
-    }, [status])
+    }, [status]);
 
     const handleClick = (index) => {
         if (board[index] || calculateWinner(board)) return;
         const newBoard = board.slice();
         newBoard[index] = iconCt;
-        socket.emit(`update-board`, {
+        socket.emit('update-board', {
             board: newBoard,
             isXNext: !isXNext,
-            roomId: roomNumber
+            roomId: roomNumber,
+            isPlayer1: you === player1 ? true : false,
         });
     };
 
     const startGame = () => {
         if (player1 && player2) {
-            socket.emit(`start-game`, roomNumber);
+            socket.emit('start-game', roomNumber);
         }
     };
 
     useEffect(() => {
-        socket.on(`start-game-success`, data => {
+        socket.on('start-game-success', data => {
             setOwer(data.ower);
             setBoard(data.board);
             setIconPlayer1(icon.current[data.player1]);
             setIconPlayer2(icon.current[data.player1 ? 0 : 1]);
             setIsXNext(data.isXNext);
             setIconCt(icon.current[data.isXNext ? 1 : 0]);
+            setTimeLeft(data.time);
         });
 
-        socket.on(`update-board-success`, data => {
+        socket.on('update-board-success', data => {
             setBoard(data.board);
             setIsXNext(data.isXNext);
             setIconCt(icon.current[data.isXNext ? 1 : 0]);
+            setTimeLeft(data.timeLeft);
         });
 
-        socket.on(`return-kq`, (kq) => {
+        socket.on("update-time-noti", (time) => {
+            setTimeLeft(time);
+            timeLeftRef.current = time; // Cập nhật ref để đảm bảo đồng bộ
+        });
+
+        socket.on('return-kq', (kq) => {
             setModalEnd(true);
             setKq(kq);
         });
 
         return () => {
-            socket.off(`start-game-success`);
-            socket.off(`update-board-success`);
-            socket.off(`return-kq`);
+            socket.off('start-game-success');
+            socket.off('update-board-success');
+            socket.off('return-kq');
+            socket.off('update-time-noti');
         };
     }, [socket]);
 
@@ -119,12 +164,25 @@ const Room = ({ roomNumber, player1, player2, onBack, ower, setOwer, you, socket
         <div className='room-wrapper'>
             <button className="back-button" onClick={onBack}>← Quay lại</button>
             <div className="room-container">
-                <h2>Room Number: {roomNumber}</h2>
+                <h2>Room Number: {roomNumber}<CopyButton text={roomNumber} /></h2>
                 <div className='playerStatus'>
-                    <h3>Player 1: {player1} <span className="player-icon">{iconPlayer1}</span></h3>
-                    <h3>Player 2: {player2} <span className="player-icon">{iconPlayer2}</span></h3>
+                    <h3 style={{ position: 'relative' }}>
+                        <span className={iconCt === iconPlayer1 ? 'allow statusPl' : 'noAllow statusPl'}></span>
+                        {player1}
+                        <span className="player-icon">{iconPlayer1}{player1 === you &&
+                            <span style={{ color: 'black' }}>(YOU)</span>}</span>
+                    </h3>
+                    <h3 style={{ position: 'relative' }}>
+                        <span className={iconCt === iconPlayer2 ? 'allow statusPl' : 'noAllow statusPl'}></span>
+                        {player2}
+                        <span className="player-icon">{iconPlayer2}{player2 === you &&
+                            <span style={{ color: 'black' }}>(YOU)</span>}</span>
+                    </h3>
                 </div>
-                {!ower && <div className="status">{status}</div>}
+                {!ower && <div className="status">
+                    {status} <br />
+                    {<span>Thời gian: {timeLeft}s</span>}
+                </div>}
                 {!ower ? <div className="board">
                     {board.map((value, index) => (
                         <button
@@ -138,17 +196,16 @@ const Room = ({ roomNumber, player1, player2, onBack, ower, setOwer, you, socket
                         </button>
                     ))}
                 </div> : <div>
-                    {ower === you ? <button
-                        onClick={startGame}
-                        disabled={!player1 || !player2}
-                        style={{
-                            backgroundColor: player1 && player2 ? 'blue' : 'gray',
-                            cursor: player1 && player2 ? 'pointer' : 'not-allowed',
-                            color: `white`
-                        }}
-                    >
-                        Start Game
-                    </button> : <span>Đang chờ chủ phòng bắt đầu</span>}
+                    {ower === you ?
+                        <button
+                            onClick={startGame}
+                            disabled={!player1 || !player2}
+                            className={`start-game-btn ${player1 && player2 ? 'active' : 'disabled'}`}
+                        >
+                            Start Game
+                        </button>
+                        : <span className="waiting-message">Đang chờ chủ phòng bắt đầu</span>
+                    }
                 </div>}
             </div>
             {modalEnd && <ModalEnd kq={kq} setModalEnd={setModalEnd} onBack={() => setStart(false)} />}

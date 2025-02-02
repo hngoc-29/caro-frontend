@@ -3,6 +3,11 @@
   margin: 0;
 }
 
+.App {
+  padding-top: 10px;
+  user-select: none;
+}
+
 .page-1 {
   display: flex;
   flex-direction: column;
@@ -70,6 +75,7 @@
   z-index: 10;
   flex-direction: column;
   align-items: center;
+  margin-top: 10px;
 }
 
 .countSec {
@@ -77,6 +83,7 @@
   width: 50px;
   height: 50px;
   display: flex;
+  margin-top: 10px;
   justify-content: center;
   align-items: center;
   border-radius: 50%;
@@ -263,10 +270,28 @@
 
 .playerStatus {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-around;
   width: 100%;
   font-size: 18px;
   margin-top: 10px;
+}
+
+.playerStatus .statusPl {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  left: -20px;
+  height: 10px;
+  width: 10px;
+  border-radius: 50%;
+}
+
+.playerStatus .allow {
+  background-color: #4CAF50;
+}
+
+.playerStatus .noAllow {
+  background-color: #d43f3f;
 }
 
 .playerStatus span {
@@ -421,4 +446,69 @@
   .chat-container {
     width: 90%;
   }
+}
+
+/* Style cho nút Start Game */
+.start-game-btn,
+.waitBtnBack {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  font-weight: bold;
+  color: white;
+  cursor: not-allowed;
+  transition: all 0.3s ease;
+  background-color: #B0B0B0;
+  /* Màu xám khi không đủ player */
+}
+
+.start-game-btn {
+  margin-top: 10px;
+}
+
+.waitBtnBack {
+  padding: 5px 10px;
+  background-color: rgb(120, 238, 42);
+  cursor: pointer;
+}
+
+.start-game-btn.active {
+  background-color: #4CAF50;
+  /* Màu xanh khi đủ player */
+  cursor: pointer;
+}
+
+.start-game-btn.active:hover {
+  background-color: #45a049;
+  /* Màu khi hover */
+}
+
+.start-game-btn:disabled {
+  cursor: not-allowed;
+  background-color: #B0B0B0;
+  /* Màu xám khi disabled */
+  box-shadow: none;
+}
+
+/* Style cho thông báo chờ */
+.waiting-message {
+  margin-top: 20px;
+  font-size: 16px;
+  color: #666;
+}
+
+/* copy component */
+.copy-button {
+  margin-left: 4px;
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  background-color: white;
+  font-size: 16px;
+}
+
+.copy-button:hover {
+  background-color: #f0f0f0;
 }
