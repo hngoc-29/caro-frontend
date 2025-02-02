@@ -15,7 +15,7 @@ function App() {
   const [ower, setOwer] = useState(null);
   const socket = useRef(null);
   useEffect(() => {
-    socket.current = io('http://localhost:3001');
+    socket.current = io('https://caro-backend.onrender.com');
 
     socket.current.on(`find-player-wait`, () => {
       setFind(true);
