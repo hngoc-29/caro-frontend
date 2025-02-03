@@ -20,6 +20,7 @@ const Room = ({ roomNumber, player1, player2, onBack, ower, setOwer, you, socket
     const timeLeftRef = useRef(timeLeft);
 
     useEffect(() => {
+        document.title = `Caro Game | Room ${roomNumber}`;
         const updateSize = () => {
             if (window.innerWidth < 600) {
                 setBoardSize(60); // Nhỏ hơn khi màn hình nhỏ
@@ -31,7 +32,10 @@ const Room = ({ roomNumber, player1, player2, onBack, ower, setOwer, you, socket
         window.addEventListener("resize", updateSize);
         updateSize(); // Gọi ngay lần đầu tiên
 
-        return () => window.removeEventListener("resize", updateSize);
+        return () => {
+            window.removeEventListener("resize", updateSize);
+            document.title = 'Caro Game';
+        }
     }, []);
 
     useEffect(() => {
@@ -142,19 +146,17 @@ const Room = ({ roomNumber, player1, player2, onBack, ower, setOwer, you, socket
                     <h3 style={{ position: 'relative' }}>
                         <span className={iconCt === iconPlayer1 ? 'allow statusPl' : 'noAllow statusPl'}></span>
                         {player1}
-                        <span className="player-icon">{iconPlayer1}{player1 === you &&
-                            <span style={{ color: 'black' }}>(YOU)</span>}</span>
+                        <span className="player-icon">{iconPlayer1}</span>
                     </h3>
                     <h3 style={{ position: 'relative' }}>
                         <span className={iconCt === iconPlayer2 ? 'allow statusPl' : 'noAllow statusPl'}></span>
                         {player2}
-                        <span className="player-icon">{iconPlayer2}{player2 === you &&
-                            <span style={{ color: 'black' }}>(YOU)</span>}</span>
+                        <span className="player-icon">{iconPlayer2}</span>
                     </h3>
                 </div>
                 {!ower && <div className="status">
                     {status} <br />
-                    {<span>Thời gian: {timeLeft}s</span>}
+                    {<span>Time: {timeLeft}s</span>}
                 </div>}
                 {!ower ? <div className="board">
                     {board.map((value, index) => (

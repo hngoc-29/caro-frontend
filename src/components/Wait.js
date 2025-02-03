@@ -10,6 +10,11 @@ export default function Wait({ huyFind }) {
             clearInterval(countUp);
         }
     }, []);
+
+    React.useEffect(() => {
+        document.title = 'Caro Game | Match players';
+        return () => document.title = 'Caro Game';
+    }, []);
     return (
         <div className='waitModal'>
             <h2 className='titleFind'>Đang tìm người chơi</h2>

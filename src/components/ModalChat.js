@@ -48,9 +48,9 @@ export default function ChatRoom({ socket, room, you }) {
                             type="text"
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
-                            placeholder="Nhập tin nhắn..."
+                            placeholder="Enter message..."
                         />
-                        <button onClick={sendMessage}>Gửi</button>
+                        <button onClick={sendMessage}>Send</button>
                     </div>
                 </div>
             )}

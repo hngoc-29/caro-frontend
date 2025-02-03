@@ -2,16 +2,19 @@ import React from "react";
 
 const Modal = ({ setModalOpen, handleConfirm }) => {
     const [inputCode, setInputCode] = React.useState("");
-    //if (!isOpen) return null;
+    React.useEffect(() => {
+        document.title = 'Caro Game | Join Room';
+        return () => document.title = 'Caro Game';
+    }, []);
 
     return (
         <div className="modal-overlay" onClick={() => setModalOpen(false)}>
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                 <button className="modal-close" onClick={() => setModalOpen(false)}>×</button>
-                <h2>Nhập thông tin</h2>
+                <h2>Join Room</h2>
                 <input
                     type="text"
-                    placeholder="Nhập nội dung..."
+                    placeholder="Enter room id..."
                     value={inputCode}
                     onChange={(e) => setInputCode(e.target.value)}
                     className="modal-input"
