@@ -13,7 +13,6 @@ const Room = ({ roomNumber, player1, player2, onBack, ower, setOwer, you, socket
     const [isXNext, setIsXNext] = useState(null);
     const [modalEnd, setModalEnd] = useState(false);
     const [kq, setKq] = useState(null);
-    const [winner, setWinner] = useState(null);
     const [status, setStatus] = useState('');
     const [timeLeft, setTimeLeft] = useState(10);
     const [boardSize, setBoardSize] = useState(80); // Kích thước ô cờ mặc định
@@ -49,14 +48,11 @@ const Room = ({ roomNumber, player1, player2, onBack, ower, setOwer, you, socket
                 if (timeLeftRef.current <= 1) {
                     clearInterval(timerRef.current);
                     const newBoard = board.slice();
-                    const winner = calculateWinner(newBoard);
-                    if (!winner) {
-                        socket.emit('update-board', {
-                            board: newBoard,
-                            isXNext: !isXNext,
-                            roomId: roomNumber,
-                        });
-                    }
+                    socket.emit('update-board', {
+                        board: newBoard,
+                        isXNext: !isXNext,
+                        roomId: roomNumber,
+                    });
                 } else {
                     socket.emit('update-time', { time: timeLeftRef.current - 1, roomId: roomNumber });
                 }
@@ -78,23 +74,16 @@ const Room = ({ roomNumber, player1, player2, onBack, ower, setOwer, you, socket
         if (!ower) startGame();
     }, []);
 
-    useEffect(() => {
-        if (winner) {
-            if (you === player1) {
-                socket.emit('check-kq', { winner, roomId: roomNumber });
-            }
-        }
-    }, [status]);
-
     const handleClick = (index) => {
-        if (board[index] || calculateWinner(board)) return;
+        if (board[index]) return;
         const newBoard = board.slice();
         newBoard[index] = iconCt;
         socket.emit('update-board', {
             board: newBoard,
             isXNext: !isXNext,
             roomId: roomNumber,
-            isPlayer1: you === player1 ? true : false,
+            player1: iconPlayer1,
+            player2: iconPlayer2,
         });
     };
 
@@ -140,24 +129,8 @@ const Room = ({ roomNumber, player1, player2, onBack, ower, setOwer, you, socket
         };
     }, [socket]);
 
-    const calculateWinner = (squares) => {
-        const lines = [
-            [0, 1, 2], [3, 4, 5], [6, 7, 8],
-            [0, 3, 6], [1, 4, 7], [2, 5, 8],
-            [0, 4, 8], [2, 4, 6],
-        ];
-        for (let i = 0; i < lines.length; i++) {
-            const [a, b, c] = lines[i];
-            if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-                return squares[a];
-            }
-        }
-        return null;
-    };
-
     useEffect(() => {
-        setWinner(calculateWinner(board));
-        setStatus(winner ? `Winner: ${winner}` : `Next player: ${iconCt}`);
+        setStatus(kq ? kq : `Next player: ${iconCt}`);
     });
 
     return (
